@@ -85,7 +85,10 @@ object Transformers {
     }
     val seriesTransformer: JsonTransformer<Series> = { node ->
         node.checkNodeType(JsonNodeType.STRING)
-        val st = node.textValue() ?: error("Escaped node type check!")
+        var st = node.textValue() ?: error("Escaped node type check!")
+        if (st == "switch"){
+            st = "groove"
+        }
         val series: Series? = Series.VALUES.find { it.jsonName.toLowerCase() == st.toLowerCase() }
         if (series == null)
             Result.Failure(node, st, "No series found with that name ($st). Supported: ${Series.VALUES.map(Series::jsonName)}")

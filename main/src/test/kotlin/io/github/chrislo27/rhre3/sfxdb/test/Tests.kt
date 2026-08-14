@@ -43,7 +43,7 @@ object Tests {
         sfxFolder = when {
             sfxFolder1.exists() -> sfxFolder1
             sfxFolder2.exists() -> sfxFolder2
-            else -> File(System.getProperty("user.home")).resolve(".rhre3/sfx/master/games/")
+            else -> File(System.getProperty("user.home")).resolve(".rhre3adv/sfx/master/games/")
         }
         assertEquals(true, sfxFolder.exists())
     }

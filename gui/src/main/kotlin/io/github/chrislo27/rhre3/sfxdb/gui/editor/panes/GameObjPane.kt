@@ -30,7 +30,7 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
     }
     val nameField = TextField(struct.name)
     val seriesComboBox =
-        ComboBox<Series>(FXCollections.observableArrayList(Series.VALUES - listOf(Series.SWITCH))).apply {
+        ComboBox<Series>(FXCollections.observableArrayList(Series.VALUES)).apply {
             this.selectionModel.select(struct.series)
         }
     val languageComboBox =

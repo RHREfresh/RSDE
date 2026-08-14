@@ -96,6 +96,8 @@ class CueObject : DatamodelObject() {
     var loopEnd: Result<Float> by Property(Transformers.floatTransformer, 0f)
     var pitchBending: Result<Boolean> by Property(Transformers.booleanTransformer, false)
     var writtenPitch: Result<Int> by Property(Transformers.intTransformer, 0)
+    var randomPitchLowCents: Result<Int> by Property(Transformers.intTransformer, 0)
+    var randomPitchHighCents: Result<Int> by Property(Transformers.intTransformer, 0)
 
     override fun producePerfectADT(): Cue {
         return Cue(
@@ -104,7 +106,7 @@ class CueObject : DatamodelObject() {
             endingSound.orException(), responseIDs.orException(), baseBpm.orException(), useTimeStretching.orException(),
             baseBpmRules.orException(),
             loops.orException(), earliness.orException(), loopStart.orException(), loopEnd.orException(),
-            pitchBending.orException(), writtenPitch.orException()
+            pitchBending.orException(), writtenPitch.orException(), randomPitchLowCents.orException(), randomPitchHighCents.orException()
         )
     }
 
@@ -115,7 +117,7 @@ class CueObject : DatamodelObject() {
             endingSound.orNull(), responseIDs.orNull(), baseBpm.orElse(0f), useTimeStretching.orElse(true),
             baseBpmRules.orElse(BaseBpmRules.ALWAYS),
             loops.orElse(false), earliness.orElse(0f), loopStart.orElse(0f), loopEnd.orElse(0f),
-            pitchBending.orElse(false), writtenPitch.orElse(0)
+            pitchBending.orElse(false), writtenPitch.orElse(0), randomPitchLowCents.orElse(0), randomPitchHighCents.orElse(0)
         )
     }
 }

@@ -8,7 +8,7 @@ enum class Series(@get:JsonValue val jsonName: String, @JsonIgnore val properNam
 
     OTHER("other", ""),
     TENGOKU("tengoku", "Tengoku"), DS("ds", "DS"), FEVER("fever", "Fever"), MEGAMIX("megamix", "Megamix"),
-    SWITCH("switch", ""),
+    GROOVE("groove", "Groove"),
     SIDE("side", "");
 
     companion object {

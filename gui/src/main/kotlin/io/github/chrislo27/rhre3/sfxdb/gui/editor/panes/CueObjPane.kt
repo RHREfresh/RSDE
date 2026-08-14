@@ -9,10 +9,12 @@ import io.github.chrislo27.rhre3.sfxdb.gui.ui.ChipPane
 import io.github.chrislo27.rhre3.sfxdb.gui.util.Localization
 import io.github.chrislo27.rhre3.sfxdb.gui.util.bindLocalized
 import io.github.chrislo27.rhre3.sfxdb.gui.util.doubleSpinnerFactory
+import io.github.chrislo27.rhre3.sfxdb.gui.util.intSpinnerFactory
 import io.github.chrislo27.rhre3.sfxdb.gui.validation.Validators
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.scene.control.*
+import javafx.scene.layout.GridPane
 import javafx.util.StringConverter
 
 
@@ -54,12 +56,14 @@ class CueObjPane(editor: Editor, struct: Cue) : DatamodelPane<Cue>(editor, struc
     val fileExtField = TextField(struct.fileExtension).apply {
         this.promptText = SoundFileExtensions.DEFAULT.fileExt
     }
-    val earlinessField = doubleSpinnerFactory(0.0, Float.MAX_VALUE.toDouble(), 0.0, 0.1)
-    val loopStartField = doubleSpinnerFactory(0.0, Float.MAX_VALUE.toDouble(), 0.0, 0.1)
-    val loopEndField = doubleSpinnerFactory(-1.0, Float.MAX_VALUE.toDouble(), 0.0, 0.1)
+    val earlinessField = doubleSpinnerFactory(0.0, Float.MAX_VALUE.toDouble(), struct.earliness.toDouble(), 0.1)
+    val loopStartField = doubleSpinnerFactory(0.0, Float.MAX_VALUE.toDouble(), struct.loopStart.toDouble(), 0.1)
+    val loopEndField = doubleSpinnerFactory(-1.0, Float.MAX_VALUE.toDouble(), struct.loopEnd.toDouble(), 0.1)
     val responseIDsField = ChipPane(FXCollections.observableArrayList((struct.responseIDs ?: mutableListOf()).map { Chip(it) }))
     val pitchBendingField = CheckBox().apply { this.isSelected = struct.pitchBending }
     val writtenPitchSpinner = Spinner<Int>(-128, 127, struct.writtenPitch)
+    val randomLowCentsSpinner = intSpinnerFactory(Int.MIN_VALUE, Int.MAX_VALUE, struct.randomPitchLowCents, 1)
+    val randomHighCentsSpinner = intSpinnerFactory(Int.MIN_VALUE, Int.MAX_VALUE, struct.randomPitchHighCents, 1)
 
     init {
         addProperty(Label().bindLocalized("datamodel.type"), Label("cue").apply { styleClass += "monospaced" })
@@ -112,6 +116,13 @@ class CueObjPane(editor: Editor, struct: Cue) : DatamodelPane<Cue>(editor, struc
         addProperty(Label().bindLocalized("datamodel.responseIDs").apply {
             tooltip = Tooltip().bindLocalized("datamodel.responseIDs.tooltip")
         }, responseIDsField)
+
+        val pitchRange = GridPane()
+        pitchRange.add(randomLowCentsSpinner, 0, 0)
+        pitchRange.add(randomHighCentsSpinner, 1, 0)
+        addProperty(Label().bindLocalized("cueObject.randPitch").apply {
+            tooltip = Tooltip().bindLocalized("cueObject.randPitch.tooltip")
+        }, pitchRange)
     }
 
     init {
@@ -185,6 +196,14 @@ class CueObjPane(editor: Editor, struct: Cue) : DatamodelPane<Cue>(editor, struc
             struct.writtenPitch = n
             editor.markDirty()
         }
+        randomLowCentsSpinner.valueProperty().addListener { _, _, n ->
+            struct.randomPitchLowCents = n
+            editor.markDirty()
+        }
+        randomHighCentsSpinner.valueProperty().addListener { _, _, n ->
+            struct.randomPitchHighCents = n
+            editor.markDirty()
+        }
 
         fileExtField.textProperty().addListener { _, _, _ ->
             editor.refreshLists()
@@ -211,6 +230,12 @@ class CueObjPane(editor: Editor, struct: Cue) : DatamodelPane<Cue>(editor, struc
         loopEndField.valueProperty().addListener { _, _, _ ->
             editor.refreshLists()
         }
+//        randomLowCentsSpinner.valueProperty().addListener { _, _, _ ->
+//            editor.refreshLists()
+//        }
+//        randomHighCentsSpinner.valueProperty().addListener { _, _, _ ->
+//            editor.refreshLists()
+//        }
     }
 
     init {
