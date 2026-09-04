@@ -114,14 +114,15 @@ class KeepTheBeat(
     }
 }
 
-@JsonPropertyOrder("type", "id", "name", "deprecatedIDs", "responseIDs", "cues")
+@JsonPropertyOrder("type", "id", "name", "deprecatedIDs", "responseIDs", "stretchable", "cues")
 class RandomCue(
         id: String, name: String, deprecatedIDs: MutableList<String>, subtext: String,
         cues: MutableList<CuePointer>,
-        @JsonInclude(JsonInclude.Include.NON_EMPTY) var responseIDs: List<String>? = null
+        @JsonInclude(JsonInclude.Include.NON_EMPTY) var responseIDs: List<String>? = null,
+        @JsonInclude(JsonInclude.Include.NON_EMPTY) var stretchable: Boolean = false
 ) : MultipartDatamodel("randomCue", id, name, deprecatedIDs, subtext, cues) {
     override fun copy(): Datamodel {
-        return RandomCue(id, name, deprecatedIDs, subtext, getCopyOfCues(), responseIDs?.toList())
+        return RandomCue(id, name, deprecatedIDs, subtext, getCopyOfCues(), responseIDs?.toList(), stretchable)
     }
 }
 

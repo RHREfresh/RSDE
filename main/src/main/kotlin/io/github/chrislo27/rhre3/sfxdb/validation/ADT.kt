@@ -190,18 +190,19 @@ class RandomCueObject : DatamodelObject() {
 
     // Optional after this line
     var responseIDs: Result<MutableList<String>> by Property(Transformers.responseIDsTransformer, mutableListOf())
+    var stretchable: Result<Boolean> by Property(Transformers.booleanTransformer, false)
 
     override fun producePerfectADT(): RandomCue {
         return RandomCue(
             id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
-            cues.orException().map { it.orException().producePerfectADT() }.toMutableList(), responseIDs.orException()
+            cues.orException().map { it.orException().producePerfectADT() }.toMutableList(), responseIDs.orException(), stretchable.orException()
         )
     }
 
     override fun produceImperfectADT(): RandomCue {
         return RandomCue(
             id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
-            cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(), responseIDs.orNull()
+            cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(), responseIDs.orNull(), stretchable.orElse(false)
         )
     }
 }

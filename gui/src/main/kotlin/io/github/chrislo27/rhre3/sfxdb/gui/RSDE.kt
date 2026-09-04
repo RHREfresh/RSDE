@@ -39,7 +39,7 @@ class RSDE : Application() {
             } else {
                 ".rhrefresh"
             }
-        val rootFolder: File = File(System.getProperty("user.home")).resolve("$rhreRootPath.rhrefresh/rsde/").apply { mkdirs() }
+        val rootFolder: File = File(System.getProperty("user.home")).resolve("$rhreRootPath/rsde/").apply { mkdirs() }
         val rhreRoot: File = File(System.getProperty("user.home")).resolve(rhreRootPath).apply {
             mkdirs()
         }

@@ -9,6 +9,7 @@ import io.github.chrislo27.rhre3.sfxdb.gui.util.bindLocalized
 import io.github.chrislo27.rhre3.sfxdb.gui.validation.Validators
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
+import javafx.scene.control.CheckBox
 import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
 
@@ -16,6 +17,7 @@ import javafx.scene.control.Tooltip
 class RandomCueObjPane(editor: Editor, struct: RandomCue) : MultipartStructPane<RandomCue>(editor, struct) {
 
     val responseIDsField = ChipPane(FXCollections.observableArrayList((struct.responseIDs ?: listOf()).map { Chip(it) }))
+    val stretchableField = CheckBox().apply { this.isSelected = struct.stretchable }
     override val cuesPane: CuesPane<RandomCue> = CuesPane(this) { pointer, pane -> RandomCueCuePointerPane(pointer, pane) }
 
     init {
@@ -33,11 +35,20 @@ class RandomCueObjPane(editor: Editor, struct: RandomCue) : MultipartStructPane<
             tooltip = Tooltip().bindLocalized("datamodel.responseIDs.tooltip")
         }, responseIDsField)
 
+        addProperty(Label().bindLocalized("datamodel.stretchable").apply {
+            tooltip = Tooltip().bindLocalized("datamodel.stretchable.tooltip")
+        }, stretchableField)
+
         centreVbox.children += cuesPane
     }
 
     init {
         // Bind to struct
+
+        stretchableField.selectedProperty().addListener { _, _, newValue ->
+            struct.stretchable = newValue
+            editor.markDirty()
+        }
         responseIDsField.list.addListener(ListChangeListener { evt ->
             val list = mutableListOf<String>()
             while (evt.next()) {
