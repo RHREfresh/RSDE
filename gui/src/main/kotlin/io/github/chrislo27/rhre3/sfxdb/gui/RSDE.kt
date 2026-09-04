@@ -34,8 +34,13 @@ class RSDE : Application() {
     companion object {
         const val TITLE = "RHRE SFX Database Editor"
         val VERSION = Version(1, 1, 8, "")
-        val rootFolder: File = File(System.getProperty("user.home")).resolve(".rhre3adv/rsde/").apply { mkdirs() }
-        val rhreRoot: File = File(System.getProperty("user.home")).resolve(".rhre3adv/").apply {
+        val rhreRootPath = if(System.getProperty("os.name", "???")?.toLowerCase(Locale.ROOT)!!.startsWith("linux")){
+                ".config/RHREfresh"
+            } else {
+                ".rhrefresh"
+            }
+        val rootFolder: File = File(System.getProperty("user.home")).resolve("$rhreRootPath.rhrefresh/rsde/").apply { mkdirs() }
+        val rhreRoot: File = File(System.getProperty("user.home")).resolve(rhreRootPath).apply {
             mkdirs()
         }
         val customSFXFolder: File = rhreRoot.resolve("customSounds/").apply {
