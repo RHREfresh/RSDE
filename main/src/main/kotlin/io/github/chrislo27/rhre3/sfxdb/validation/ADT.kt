@@ -20,6 +20,7 @@ class GameObject : Struct {
     val group: Result<String> by Property(Transformers.stringTransformer, "")
     val groupDefault: Result<Boolean> by Property(Transformers.booleanTransformer, false)
     val priority: Result<Int> by Property(Transformers.intTransformer, 0)
+    val gameOrder: Result<Int> by Property(Transformers.intTransformer, 0)
     val searchHints: Result<MutableList<String>> by Property(Transformers.stringArrayTransformer, mutableListOf())
     val noDisplay: Result<Boolean> by Property(Transformers.booleanTransformer, false)
 
@@ -27,7 +28,7 @@ class GameObject : Struct {
         return Game(
             id.orException(), name.orException(), series.orException(),
             language.orException(),
-            group.orException(), groupDefault.orException(), priority.orException(), searchHints.orException(), noDisplay.orException(),
+            group.orException(), groupDefault.orException(), priority.orException(), gameOrder.orException(), searchHints.orException(), noDisplay.orException(),
             objects.orException().map { it.orException().producePerfectADT() }.toMutableList()
         )
     }
@@ -36,7 +37,7 @@ class GameObject : Struct {
         return Game(
             id.orElse(""), name.orElse(""), series.orElse(Series.OTHER),
             language.orElse(Language.NONE),
-            group.orElse(""), groupDefault.orElse(false), priority.orElse(0), searchHints.orElse(mutableListOf()), noDisplay.orElse(false),
+            group.orElse(""), groupDefault.orElse(false), priority.orElse(0), gameOrder.orElse(-1), searchHints.orElse(mutableListOf()), noDisplay.orElse(false),
             objects.orElse(mutableListOf()).mapNotNull { it.orNull()?.produceImperfectADT() }.toMutableList()
         )
     }

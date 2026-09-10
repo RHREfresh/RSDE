@@ -51,6 +51,7 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         this.isSelected = struct.groupDefault
     }
     val prioritySpinner = Spinner<Int>(-128, 127, struct.priority)
+    val gameOrderSpinner = Spinner<Int>(-1, Int.MAX_VALUE, struct.gameOrder)
     val searchHintsField = ChipPane(FXCollections.observableArrayList((struct.searchHints ?: mutableListOf()).map { Chip(it) }))
     val noDisplayCheckbox = CheckBox().apply {
         this.isSelected = struct.noDisplay
@@ -115,6 +116,9 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         addProperty(Label().bindLocalized("gameObject.priority").apply {
             tooltip = Tooltip().bindLocalized("gameObject.priority.tooltip")
         }, prioritySpinner)
+        addProperty(Label().bindLocalized("gameObject.gameOrder").apply {
+            tooltip = Tooltip().bindLocalized("gameObject.gameOrder.tooltip")
+        }, gameOrderSpinner)
         addProperty(Label().bindLocalized("gameObject.searchHints").apply {
             tooltip = Tooltip().bindLocalized("gameObject.searchHints.tooltip")
         }, searchHintsField)
@@ -292,6 +296,10 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         }
         prioritySpinner.valueProperty().addListener { _, _, newValue ->
             struct.priority = newValue
+            editor.markDirty()
+        }
+        gameOrderSpinner.valueProperty().addListener { _, _, newValue ->
+            struct.gameOrder = newValue
             editor.markDirty()
         }
         searchHintsField.list.addListener(ListChangeListener { evt ->

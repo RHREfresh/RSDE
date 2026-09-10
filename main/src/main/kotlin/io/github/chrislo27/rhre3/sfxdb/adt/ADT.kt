@@ -18,6 +18,7 @@ class Game(
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var group: String? = null,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var groupDefault: Boolean = false,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var priority: Int = 0,
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var gameOrder: Int = -1,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var searchHints: MutableList<String>? = null,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var noDisplay: Boolean = false,
 
