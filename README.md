@@ -1,4 +1,5 @@
 <img align="right" src="gui/src/main/resources/icon/256.png" height="256" width="256">
+
 # RHREfresh SFX Database Editor
 RSDE is a GUI editor for the [RHREfresh SFXDB](https://github.com/RHREfresh/RHRE-database).
 
