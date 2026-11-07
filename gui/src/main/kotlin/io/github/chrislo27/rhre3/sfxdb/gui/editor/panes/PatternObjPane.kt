@@ -59,6 +59,9 @@ class PatternObjPane(editor: Editor, struct: Pattern) : MultipartStructPane<Patt
                 tooltip = Tooltip().bindLocalized("cuePointer.track.tooltip")
             }, trackField)
             addProperty(Label().bindLocalized("cuePointer.volume"), volumeField)
+            addProperty(Label().bindLocalized("cuePointer.ignorePitching").apply {
+                tooltip = Tooltip().bindLocalized("cuePointer.ignorePitching.tooltip")
+            }, ignorePitchingField)
         }
     }
 

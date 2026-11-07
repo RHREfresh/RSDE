@@ -61,19 +61,20 @@ class CuePointerObject : Struct {
     var track: Result<Int> by Property(Transformers.intTransformer, 0)
     var semitone: Result<Int> by Property(Transformers.intTransformer, 0)
     var volume: Result<Int> by Property(Transformers.volumeTransformer, 100)
+    var ignorePitching: Result<Boolean> by Property(Transformers.booleanTransformer, false)
     var metadata: Result<MutableMap<String, Any?>?> by Property(Transformers.cuePointerMetadataTransformer, null as MutableMap<String, Any?>?)
 
     override fun producePerfectADT(): CuePointer {
         return CuePointer(
             id.orException(), beat.orElse(Float.MIN_VALUE), duration.orException(), semitone.orException(),
-            volume.orException(), track.orException(), metadata.orNull()
+            volume.orException(), ignorePitching.orException(), track.orException(), metadata.orNull()
         )
     }
 
     override fun produceImperfectADT(): CuePointer {
         return CuePointer(
             id.orElse(""), beat.orElse(Float.MIN_VALUE), duration.orElse(0f), semitone.orElse(0),
-            volume.orElse(100), track.orElse(0), metadata.orNull()
+            volume.orElse(100), ignorePitching.orElse(false), track.orElse(0), metadata.orNull()
         )
     }
 }

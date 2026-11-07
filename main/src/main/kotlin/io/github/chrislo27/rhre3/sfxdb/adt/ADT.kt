@@ -31,11 +31,12 @@ class CuePointer(
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) var duration: Float = 0f,
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) var semitone: Int = 0,
         @JsonInclude(JsonInclude.Include.CUSTOM, valueFilter = VolumeFilter::class) var volume: Int = 100,
+        @JsonInclude(JsonInclude.Include.NON_DEFAULT) var ignorePitching:Boolean = false,
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) var track: Int = 0,
         @JsonInclude(JsonInclude.Include.NON_EMPTY) var metadata: MutableMap<String, Any?>? = null
 ) : JsonStruct {
     fun copy(id: String = this.id, beat: Float = this.beat, duration: Float = this.duration, semitone: Int = this.semitone, volume: Int = this.volume, track: Int = this.track, metadata: MutableMap<String, Any?>? = this.metadata): CuePointer {
-        return CuePointer(id, beat, duration, semitone, volume, track, metadata?.toMutableMap())
+        return CuePointer(id, beat, duration, semitone, volume, ignorePitching, track, metadata?.toMutableMap())
     }
 }
 

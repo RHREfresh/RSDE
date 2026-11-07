@@ -429,8 +429,9 @@ abstract class MultipartStructPane<T : MultipartDatamodel>(editor: Editor, struc
         val semitoneField: Spinner<Int> = intSpinnerFactory(-39, 48, cuePointer.semitone, 1)
         val trackField: Spinner<Int> = intSpinnerFactory(-16, 16, cuePointer.track, 1)
         val volumeField: Spinner<Int> = intSpinnerFactory(Constants.VOLUME_RANGE.first, Constants.VOLUME_RANGE.last, cuePointer.volume, 25)
+        val ignorePitchingField = CheckBox().apply { this.isSelected = cuePointer.ignorePitching }
 
-        val allFields: List<Control> by lazy { listOf(idField, beatField, durationField, semitoneField, trackField, volumeField) }
+        val allFields: List<Control> by lazy { listOf(idField, beatField, durationField, semitoneField, trackField, volumeField, ignorePitchingField) }
 
         init {
             styleClass += "grid-pane"
@@ -466,6 +467,11 @@ abstract class MultipartStructPane<T : MultipartDatamodel>(editor: Editor, struc
             }
             volumeField.valueProperty().addListener { _, _, newValue ->
                 cuePointer.volume = newValue
+                editor.refreshLists()
+                editor.markDirty()
+            }
+            ignorePitchingField.selectedProperty().addListener { _, _, newValue ->
+                cuePointer.ignorePitching = newValue
                 editor.refreshLists()
                 editor.markDirty()
             }
