@@ -34,8 +34,13 @@ class RSDE : Application() {
     companion object {
         const val TITLE = "RHRE SFX Database Editor"
         val VERSION = Version(1, 1, 8, "")
-        val rhreRootPath = if(System.getProperty("os.name", "???")?.toLowerCase(Locale.ROOT)!!.startsWith("linux")){
+        val osName = System.getProperty("os.name", "???")?.toLowerCase(Locale.ROOT)!!
+        val rhreRootPath = if(osName.startsWith("linux")){
                 ".config/RHREfresh"
+            } else if(osName.contains("win")){
+                "AppData/Roaming/RHREfresh/"
+            } else if(osName.contains("mac")){
+                "Library/Application Support/RHREfresh/"
             } else {
                 ".rhrefresh"
             }
@@ -50,7 +55,7 @@ class RSDE : Application() {
         val SFX_DB_BRANCH = "master"
         const val GITHUB = "https://github.com/chrislo27/RSDE"
         const val RHRE_GITHUB = "https://github.com/chrislo27/RhythmHeavenRemixEditor"
-        val rhreSfxRoot: File = rhreRoot.resolve("sfx/$SFX_DB_BRANCH/")
+        val rhreSfxRoot: File = rhreRoot.resolve("sfx/")
         const val LICENSE_NAME = "Apache License 2.0"
 
         val LOGGER: Logger = LogManager.getContext(RSDE::class.java.classLoader, false).getLogger("RSDE")
