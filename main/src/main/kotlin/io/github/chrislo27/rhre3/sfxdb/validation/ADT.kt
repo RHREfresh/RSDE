@@ -147,6 +147,33 @@ class PatternObject : DatamodelObject() {
     }
 }
 
+class MultiCueObject : DatamodelObject() {
+    var cues: Result<MutableList<Result<CuePointerObject>>> by Property(Transformers.transformerToList(Transformers.cuePointerTransformer()))
+    var width: Result<Float> by Property(Transformers.positiveFloatTransformer("Width must be higher than 0", false), 1f)
+
+    // Optional after this line
+    var stretchable: Result<Boolean> by Property(Transformers.booleanTransformer, false)
+    var canSplit: Result<Boolean> by Property(Transformers.booleanTransformer, false)
+
+    override fun producePerfectADT(): MultiCue {
+        return MultiCue(
+            id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
+            cues.orException().map { it.orException().producePerfectADT() }.toMutableList(),
+            width.orException(),
+            stretchable.orException(),canSplit.orException()
+        )
+    }
+
+    override fun produceImperfectADT(): MultiCue {
+        return MultiCue(
+            id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
+            cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(),
+            width.orElse(1f),
+            stretchable.orElse(false),canSplit.orElse(false)
+        )
+    }
+}
+
 class EquidistantObject : DatamodelObject() {
     var cues: Result<MutableList<Result<CuePointerObject>>> by Property(Transformers.transformerToList(Transformers.cuePointerTransformer(beatNotUsed = true, durationNotUsed = true)))
     var distance: Result<Float> by Property(Transformers.positiveFloatTransformer("Distance must be positive, non-zero", false))

@@ -94,6 +94,7 @@ class Editor(val folder: File, val editorPane: EditorPane) {
         return when (struct) {
             is Game -> GameObjPane(this)
             is Cue -> CueObjPane(this, struct)
+            is MultiCue -> MultiCueObjPane(this, struct)
             is Pattern -> PatternObjPane(this, struct)
             is KeepTheBeat -> KeepTheBeatObjPane(this, struct)
             is Equidistant -> EquidistantObjPane(this, struct)

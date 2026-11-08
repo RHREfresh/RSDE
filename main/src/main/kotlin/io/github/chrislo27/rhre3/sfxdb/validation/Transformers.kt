@@ -190,6 +190,10 @@ object Transformers {
                 Parser.buildStruct(this, node, printProperties)
                 this to getNonSuccess(this)
             }
+            "multiCue" -> MultiCueObject().run {
+                Parser.buildStruct(this, node, printProperties)
+                this to getNonSuccess(this)
+            }
             "equidistant" -> EquidistantObject().run {
                 Parser.buildStruct(this, node, printProperties)
                 this to getNonSuccess(this)
@@ -255,6 +259,7 @@ object Transformers {
                 Result.Failure(node, value, errorMessage)
         } else initial
     }
+
 
     @Suppress("UNCHECKED_CAST")
     fun cuePointerTransformer(beatNotUsed: Boolean = false, durationNotUsed: Boolean = false): JsonTransformer<CuePointerObject> = { node ->

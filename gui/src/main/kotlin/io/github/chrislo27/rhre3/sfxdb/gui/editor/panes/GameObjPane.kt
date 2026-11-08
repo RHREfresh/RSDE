@@ -151,6 +151,7 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
             AddMenuItem("CueObject") { Cue("", "", mutableListOf(), "", 0f) },
             SeparatorMenuItem(),
             AddMenuItem("PatternObject") { Pattern("", "", mutableListOf(), "", mutableListOf()) },
+            AddMenuItem("MultiCueObject") { MultiCue("", "", mutableListOf(), "", mutableListOf(), 1f) },
             AddMenuItem("EquidistantObject") { Equidistant("", "", mutableListOf(), "", mutableListOf()) },
             AddMenuItem("KeepTheBeatObject") { KeepTheBeat("", "", mutableListOf(), "", mutableListOf()) },
             AddMenuItem("RandomCueObject") { RandomCue("", "", mutableListOf(), "", mutableListOf()) }
