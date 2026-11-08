@@ -92,16 +92,16 @@ class Pattern(
         return Pattern(id, name, deprecatedIDs, subtext, getCopyOfCues(), stretchable)
     }
 }
-@JsonPropertyOrder("type", "id", "name", "deprecatedIDs", "stretchable", "cues", "width")
+@JsonPropertyOrder("type", "id", "name", "deprecatedIDs", "stretchable", "cues", "duration")
 class MultiCue(
-        id: String, name: String, deprecatedIDs: MutableList<String>, subtext: String,
-        cues: MutableList<CuePointer>,
-        var width: Float,
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT) var stretchable: Boolean = false,
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT) var canSplit: Boolean = false
+    id: String, name: String, deprecatedIDs: MutableList<String>, subtext: String,
+    cues: MutableList<CuePointer>,
+    var duration: Float,
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var stretchable: Boolean = false,
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var canSplit: Boolean = false
 ) : MultipartDatamodel("multiCue", id, name, deprecatedIDs, subtext, cues) {
     override fun copy(): Datamodel {
-        return MultiCue(id, name, deprecatedIDs, subtext, getCopyOfCues(), width, stretchable, canSplit)
+        return MultiCue(id, name, deprecatedIDs, subtext, getCopyOfCues(), duration, stretchable, canSplit)
     }
 }
 

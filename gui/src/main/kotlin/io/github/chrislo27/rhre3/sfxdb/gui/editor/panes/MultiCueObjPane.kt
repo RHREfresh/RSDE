@@ -13,7 +13,7 @@ import javafx.scene.control.Tooltip
 
 class MultiCueObjPane(editor: Editor, struct: MultiCue) : MultipartStructPane<MultiCue>(editor, struct) {
 
-    val widthField = doubleSpinnerFactory(0.0, Float.MAX_VALUE.toDouble(), struct.width.toDouble(), 0.5)
+    val durationField = doubleSpinnerFactory(0.0, Float.MAX_VALUE.toDouble(), struct.duration.toDouble(), 0.5)
     val stretchableField = CheckBox().apply { this.isSelected = struct.stretchable }
     val canSplitField = CheckBox().apply { this.isSelected = struct.canSplit }
     override val cuesPane: CuesPane<MultiCue> = CuesPane(this) { pointer, pane -> MultiCueCuePointerPane(pointer, pane) }
@@ -22,7 +22,7 @@ class MultiCueObjPane(editor: Editor, struct: MultiCue) : MultipartStructPane<Mu
         addProperty(Label().bindLocalized("datamodel.type"), Label("multiCue").apply { styleClass += "monospaced" })
         addProperty(Label().bindLocalized("datamodel.id"), idField)
         addProperty(Label().bindLocalized("datamodel.name"), nameField)
-        addProperty(Label().bindLocalized("datamodel.width"), widthField)
+        addProperty(Label().bindLocalized("datamodel.duration"), durationField)
         addProperty(Label().bindLocalized("datamodel.deprecatedIDs").apply {
             tooltip = Tooltip().bindLocalized("datamodel.deprecatedIDs.tooltip")
         }, deprecatedIDsField)
@@ -43,8 +43,8 @@ class MultiCueObjPane(editor: Editor, struct: MultiCue) : MultipartStructPane<Mu
 
     init {
         // Bind to struct
-        widthField.valueProperty().addListener { _, _, newValue ->
-            struct.width = newValue.toFloat()
+        durationField.valueProperty().addListener { _, _, newValue ->
+            struct.duration = newValue.toFloat()
             editor.markDirty()
         }
         stretchableField.selectedProperty().addListener { _, _, newValue ->

@@ -149,7 +149,7 @@ class PatternObject : DatamodelObject() {
 
 class MultiCueObject : DatamodelObject() {
     var cues: Result<MutableList<Result<CuePointerObject>>> by Property(Transformers.transformerToList(Transformers.cuePointerTransformer()))
-    var width: Result<Float> by Property(Transformers.positiveFloatTransformer("Width must be higher than 0", false), 1f)
+    var duration: Result<Float> by Property(Transformers.positiveFloatTransformer("Duration must be higher than 0", false), 1f)
 
     // Optional after this line
     var stretchable: Result<Boolean> by Property(Transformers.booleanTransformer, false)
@@ -159,7 +159,7 @@ class MultiCueObject : DatamodelObject() {
         return MultiCue(
             id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
             cues.orException().map { it.orException().producePerfectADT() }.toMutableList(),
-            width.orException(),
+            duration.orException(),
             stretchable.orException(),canSplit.orException()
         )
     }
@@ -168,7 +168,7 @@ class MultiCueObject : DatamodelObject() {
         return MultiCue(
             id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
             cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(),
-            width.orElse(1f),
+            duration.orElse(1f),
             stretchable.orElse(false),canSplit.orElse(false)
         )
     }
