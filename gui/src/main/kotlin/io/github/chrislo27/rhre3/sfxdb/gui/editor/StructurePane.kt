@@ -19,6 +19,7 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.util.Callback
+import java.awt.Desktop
 
 
 class StructurePane(val editorPane: EditorPane) : VBox() {
@@ -128,12 +129,26 @@ class StructurePane(val editorPane: EditorPane) : VBox() {
                 }
             }
         }
-        private val gameContextMenu: ContextMenu = ContextMenu().apply {
+/*        private val gameContextMenu: ContextMenu = ContextMenu().apply {
             items += MenuItem().apply {
                 bindLocalized("editor.openFolderLocation")
                 setOnAction { _ ->
                     val item = item ?: return@setOnAction
                     item.structure.app.hostServices.showDocument("file://${item.editor.folder.absolutePath}")
+                }
+            }
+        }*/
+        // TODO, check if this works on other platforms
+        private val gameContextMenu: ContextMenu = ContextMenu().apply {
+            items += MenuItem().apply {
+                bindLocalized("editor.openFolderLocation")
+
+                setOnAction {
+                    val item = item ?: return@setOnAction
+
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(item.editor.folder)
+                    }
                 }
             }
         }

@@ -4,6 +4,7 @@ package io.github.chrislo27.rhre3.sfxdb.adt
 
 import io.github.chrislo27.rhre3.sfxdb.BaseBpmRules
 import io.github.chrislo27.rhre3.sfxdb.Language
+import io.github.chrislo27.rhre3.sfxdb.StretchBehavior
 
 
 class CueFileExtFilter {
@@ -66,6 +67,16 @@ class LanguageFilter {
     }
 }
 
+class StretchBehaviorFilter {
+    override fun equals(other: Any?): Boolean {
+        if (other is StretchBehavior) {
+            return other == StretchBehavior.STAY
+        }
+
+        return super.equals(other)
+    }
+}
+
 class BaseBpmRulesFilter {
     override fun equals(other: Any?): Boolean {
         if (other is BaseBpmRules) {
@@ -74,4 +85,8 @@ class BaseBpmRulesFilter {
 
         return super.equals(other)
     }
+}
+
+class CuesAtBottomFilter {
+    override fun equals(other: Any?): Boolean = other == true
 }

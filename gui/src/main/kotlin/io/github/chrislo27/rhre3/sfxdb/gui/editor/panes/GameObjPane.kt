@@ -56,6 +56,10 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
     val noDisplayCheckbox = CheckBox().apply {
         this.isSelected = struct.noDisplay
     }
+    val cuesAtBottomCheckbox = CheckBox().apply {
+        this.isSelected = struct.cuesAtBottom
+    }
+
 
     val objectsGrid: GridPane = GridPane().apply {
         styleClass += "multipart-objects-pane"
@@ -125,6 +129,9 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         addProperty(Label().bindLocalized("gameObject.noDisplay").apply {
             tooltip = Tooltip().bindLocalized("gameObject.noDisplay.tooltip")
         }, noDisplayCheckbox)
+        addProperty(Label().bindLocalized("gameObject.cuesAtBottom").apply {
+            tooltip = Tooltip().bindLocalized("gameObject.cuesAtBottom.tooltip")
+        }, cuesAtBottomCheckbox)
 
         centreVbox.children += Separator().apply {
             maxWidth = Double.MAX_VALUE
@@ -315,6 +322,10 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
             struct.noDisplay = newValue
             editor.markDirty()
         }
+        cuesAtBottomCheckbox.selectedProperty().addListener { _, _, newValue ->
+            struct.cuesAtBottom = newValue
+            editor.markDirty()
+        }
 
         idField.textProperty().addListener { _, _, _ ->
             editor.refreshLists()
@@ -323,6 +334,9 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
             editor.refreshLists()
         }
         noDisplayCheckbox.textProperty().addListener { _, _, _ ->
+            editor.refreshLists()
+        }
+        cuesAtBottomCheckbox.textProperty().addListener { _, _, _ ->
             editor.refreshLists()
         }
     }

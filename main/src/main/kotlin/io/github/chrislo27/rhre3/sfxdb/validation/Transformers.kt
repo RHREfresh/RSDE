@@ -95,6 +95,15 @@ object Transformers {
         else
             Result.Success(series)
     }
+    val stretchBehaviorTransformer: JsonTransformer<StretchBehavior> = { node ->
+        node.checkNodeType(JsonNodeType.STRING)
+        val st = node.textValue() ?: error("Escaped node type check!")
+        val type: StretchBehavior? = (if (st == "null") StretchBehavior.STAY else StretchBehavior.CODE_MAP[st]) as StretchBehavior?
+        if (type == null)
+            Result.Failure(node, st, "No stretching behavior found with that name ($st).")
+        else
+            Result.Success(type)
+    }
     val baseBpmRulesTransformer: JsonTransformer<BaseBpmRules> = { node ->
         node.checkNodeType(JsonNodeType.STRING)
         val st = node.textValue() ?: error("Escaped node type check!")

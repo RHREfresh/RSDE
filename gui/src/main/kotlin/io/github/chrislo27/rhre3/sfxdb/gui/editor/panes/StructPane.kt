@@ -1,6 +1,7 @@
 package io.github.chrislo27.rhre3.sfxdb.gui.editor.panes
 
 import io.github.chrislo27.rhre3.sfxdb.Constants
+import io.github.chrislo27.rhre3.sfxdb.StretchBehavior
 import io.github.chrislo27.rhre3.sfxdb.adt.*
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.Editor
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.HasValidator
@@ -410,7 +411,7 @@ abstract class MultipartStructPane<T : MultipartDatamodel>(editor: Editor, struc
         val validation = L10NValidationSupport()
 
         val idField = TextField(cuePointer.id)
-        val beatField: Spinner<Double> = doubleSpinnerFactory(0.0, Double.MAX_VALUE, cuePointer.beat.takeUnless { it == Float.MIN_VALUE }?.toDouble() ?: 0.0, 0.5)
+        val beatField: Spinner<Double> = doubleSpinnerFactory(-16.0, Double.MAX_VALUE, cuePointer.beat.takeUnless { it == Float.MIN_VALUE }?.toDouble() ?: 0.0, 0.5)
         val durationField: Spinner<Double> = Spinner<Double>().apply {
             valueFactory = SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, cuePointer.duration.coerceAtLeast(0f).toDouble(), 0.5).apply {
                 this.converter = object : StringConverter<Double>() {
@@ -430,8 +431,12 @@ abstract class MultipartStructPane<T : MultipartDatamodel>(editor: Editor, struc
         val trackField: Spinner<Int> = intSpinnerFactory(-16, 16, cuePointer.track, 1)
         val volumeField: Spinner<Int> = intSpinnerFactory(Constants.VOLUME_RANGE.first, Constants.VOLUME_RANGE.last, cuePointer.volume, 25)
         val ignorePitchingField = CheckBox().apply { this.isSelected = cuePointer.ignorePitching }
+        val stretchBehaviorComboBox =
+            ComboBox<StretchBehavior>(FXCollections.observableArrayList(StretchBehavior.VALUES)).apply {
+                this.selectionModel.select(cuePointer.stretchBehavior)
+            }
 
-        val allFields: List<Control> by lazy { listOf(idField, beatField, durationField, semitoneField, trackField, volumeField, ignorePitchingField) }
+        val allFields: List<Control> by lazy { listOf(idField, beatField, durationField, semitoneField, trackField, volumeField, ignorePitchingField, stretchBehaviorComboBox) }
 
         init {
             styleClass += "grid-pane"
@@ -475,6 +480,11 @@ abstract class MultipartStructPane<T : MultipartDatamodel>(editor: Editor, struc
                 editor.refreshLists()
                 editor.markDirty()
             }
+            stretchBehaviorComboBox.selectionModel.selectedItemProperty().addListener { _, _, newValue ->
+                cuePointer.stretchBehavior = newValue
+                editor.markDirty()
+            }
+
         }
 
         init {

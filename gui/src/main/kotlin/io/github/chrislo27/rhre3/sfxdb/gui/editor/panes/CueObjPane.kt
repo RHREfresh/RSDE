@@ -24,6 +24,7 @@ class CueObjPane(editor: Editor, struct: Cue) : DatamodelPane<Cue>(editor, struc
     val stretchableField = CheckBox().apply { this.isSelected = struct.stretchable }
     val repitchableField = CheckBox().apply { this.isSelected = struct.repitchable }
     val loopsField = CheckBox().apply { this.isSelected = struct.loops }
+    val stopAtEndField = CheckBox().apply { this.isSelected = struct.stopAtEnd }
     val baseBpmField = Spinner<Double>().apply {
         valueFactory = SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Float.MAX_VALUE.toDouble(), struct.baseBpm.toDouble(), 1.0).apply {
             this.converter = object : StringConverter<Double>() {
@@ -82,6 +83,7 @@ class CueObjPane(editor: Editor, struct: Cue) : DatamodelPane<Cue>(editor, struc
         }, stretchableField)
         addProperty(Label().bindLocalized("cueObject.repitchable"), repitchableField)
         addProperty(Label().bindLocalized("cueObject.loops"), loopsField)
+        addProperty(Label().bindLocalized("cueObject.stopAtEnd"), stopAtEndField)
         addProperty(Label().bindLocalized("cueObject.baseBpm").apply {
             tooltip = Tooltip().bindLocalized("cueObject.baseBpm.tooltip")
         }, baseBpmField)
@@ -141,6 +143,11 @@ class CueObjPane(editor: Editor, struct: Cue) : DatamodelPane<Cue>(editor, struc
         }
         loopsField.selectedProperty().addListener { _, _, newValue ->
             struct.loops = newValue
+            editor.markDirty()
+            forceUpdate()
+        }
+        stopAtEndField.selectedProperty().addListener { _, _, newValue ->
+            struct.stopAtEnd = newValue
             editor.markDirty()
             forceUpdate()
         }

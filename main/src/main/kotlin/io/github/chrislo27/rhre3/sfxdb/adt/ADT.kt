@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import io.github.chrislo27.rhre3.sfxdb.BaseBpmRules
 import io.github.chrislo27.rhre3.sfxdb.Language
 import io.github.chrislo27.rhre3.sfxdb.Series
+import io.github.chrislo27.rhre3.sfxdb.StretchBehavior
 
 
 interface JsonStruct
@@ -21,6 +22,7 @@ class Game(
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var gameOrder: Int = -1,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var searchHints: MutableList<String>? = null,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var noDisplay: Boolean = false,
+    @JsonInclude(JsonInclude.Include.CUSTOM, valueFilter = CuesAtBottomFilter::class) var cuesAtBottom: Boolean = true,
 
     var objects: MutableList<Datamodel>
 ) : JsonStruct
@@ -32,11 +34,15 @@ class CuePointer(
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) var semitone: Int = 0,
         @JsonInclude(JsonInclude.Include.CUSTOM, valueFilter = VolumeFilter::class) var volume: Int = 100,
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) var ignorePitching:Boolean = false,
+        @JsonInclude(JsonInclude.Include.CUSTOM, valueFilter = StretchBehaviorFilter::class) var stretchBehavior: StretchBehavior = StretchBehavior.STAY,
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) var track: Int = 0,
         @JsonInclude(JsonInclude.Include.NON_EMPTY) var metadata: MutableMap<String, Any?>? = null
 ) : JsonStruct {
     fun copy(id: String = this.id, beat: Float = this.beat, duration: Float = this.duration, semitone: Int = this.semitone, volume: Int = this.volume, track: Int = this.track, metadata: MutableMap<String, Any?>? = this.metadata): CuePointer {
-        return CuePointer(id, beat, duration, semitone, volume, ignorePitching, track, metadata?.toMutableMap())
+        return CuePointer(
+            id, beat, duration, semitone, volume,
+            ignorePitching, stretchBehavior,
+            track, metadata?.toMutableMap())
     }
 }
 
@@ -67,6 +73,7 @@ class Cue(
     @JsonInclude(JsonInclude.Include.CUSTOM, valueFilter = UseTimeStretchingFilter::class) var useTimeStretching: Boolean = true,
     @JsonInclude(JsonInclude.Include.CUSTOM, valueFilter = BaseBpmRulesFilter::class) var baseBpmRules: BaseBpmRules = BaseBpmRules.ALWAYS,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var loops: Boolean = false,
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var stopAtEnd: Boolean = false,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var earliness: Float = 0f,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var loopStart: Float = 0f,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var loopEnd: Float = 0f,
@@ -77,7 +84,7 @@ class Cue(
 ) : Datamodel("cue", id, name, deprecatedIDs, subtext) {
     override fun copy(): Datamodel {
         return Cue(id, name, deprecatedIDs, subtext, duration, stretchable, repitchable, fileExtension, introSound,
-            endingSound, responseIDs?.toMutableList(), baseBpm, useTimeStretching, baseBpmRules, loops, earliness,
+            endingSound, responseIDs?.toMutableList(), baseBpm, useTimeStretching, baseBpmRules, loops, stopAtEnd, earliness,
             loopStart, loopEnd, pitchBending, writtenPitch, randomPitchLowCents, randomPitchHighCents)
     }
 }
@@ -97,11 +104,15 @@ class MultiCue(
     id: String, name: String, deprecatedIDs: MutableList<String>, subtext: String,
     cues: MutableList<CuePointer>,
     var duration: Float,
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var height: Float = 1f,
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) var stretchable: Boolean = false,
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var canSplit: Boolean = false
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var canSplit: Boolean = false,
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var shouldCrop: Boolean = false,
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var minLength: Float = 0.125f,
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT) var maxLength: Float = 0f
 ) : MultipartDatamodel("multiCue", id, name, deprecatedIDs, subtext, cues) {
     override fun copy(): Datamodel {
-        return MultiCue(id, name, deprecatedIDs, subtext, getCopyOfCues(), duration, stretchable, canSplit)
+        return MultiCue(id, name, deprecatedIDs, subtext, getCopyOfCues(), duration, height, stretchable, canSplit, shouldCrop, minLength, maxLength)
     }
 }
 

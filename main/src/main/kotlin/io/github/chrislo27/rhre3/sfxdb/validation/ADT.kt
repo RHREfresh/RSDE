@@ -23,12 +23,13 @@ class GameObject : Struct {
     val gameOrder: Result<Int> by Property(Transformers.intTransformer, 0)
     val searchHints: Result<MutableList<String>> by Property(Transformers.stringArrayTransformer, mutableListOf())
     val noDisplay: Result<Boolean> by Property(Transformers.booleanTransformer, false)
+    val cuesAtBottom: Result<Boolean> by Property(Transformers.booleanTransformer, true)
 
     override fun producePerfectADT(): Game {
         return Game(
             id.orException(), name.orException(), series.orException(),
             language.orException(),
-            group.orException(), groupDefault.orException(), priority.orException(), gameOrder.orException(), searchHints.orException(), noDisplay.orException(),
+            group.orException(), groupDefault.orException(), priority.orException(), gameOrder.orException(), searchHints.orException(), noDisplay.orException(), cuesAtBottom.orException(),
             objects.orException().map { it.orException().producePerfectADT() }.toMutableList()
         )
     }
@@ -37,7 +38,7 @@ class GameObject : Struct {
         return Game(
             id.orElse(""), name.orElse(""), series.orElse(Series.OTHER),
             language.orElse(Language.NONE),
-            group.orElse(""), groupDefault.orElse(false), priority.orElse(0), gameOrder.orElse(-1), searchHints.orElse(mutableListOf()), noDisplay.orElse(false),
+            group.orElse(""), groupDefault.orElse(false), priority.orElse(0), gameOrder.orElse(-1), searchHints.orElse(mutableListOf()), noDisplay.orElse(false), cuesAtBottom.orElse(true),
             objects.orElse(mutableListOf()).mapNotNull { it.orNull()?.produceImperfectADT() }.toMutableList()
         )
     }
@@ -62,19 +63,20 @@ class CuePointerObject : Struct {
     var semitone: Result<Int> by Property(Transformers.intTransformer, 0)
     var volume: Result<Int> by Property(Transformers.volumeTransformer, 100)
     var ignorePitching: Result<Boolean> by Property(Transformers.booleanTransformer, false)
+    val stretchBehavior: Result<StretchBehavior> by Property(Transformers.stretchBehaviorTransformer, StretchBehavior.STAY)
     var metadata: Result<MutableMap<String, Any?>?> by Property(Transformers.cuePointerMetadataTransformer, null as MutableMap<String, Any?>?)
 
     override fun producePerfectADT(): CuePointer {
         return CuePointer(
             id.orException(), beat.orElse(Float.MIN_VALUE), duration.orException(), semitone.orException(),
-            volume.orException(), ignorePitching.orException(), track.orException(), metadata.orNull()
+            volume.orException(), ignorePitching.orException(), stretchBehavior.orException(), track.orException(), metadata.orNull()
         )
     }
 
     override fun produceImperfectADT(): CuePointer {
         return CuePointer(
             id.orElse(""), beat.orElse(Float.MIN_VALUE), duration.orElse(0f), semitone.orElse(0),
-            volume.orElse(100), ignorePitching.orElse(false), track.orElse(0), metadata.orNull()
+            volume.orElse(100), ignorePitching.orElse(false), stretchBehavior.orElse(StretchBehavior.STAY), track.orElse(0), metadata.orNull()
         )
     }
 }
@@ -87,6 +89,7 @@ class CueObject : DatamodelObject() {
     var repitchable: Result<Boolean> by Property(Transformers.booleanTransformer, false)
     var fileExtension: Result<String> by Property(Transformers.soundFileExtensionTransformer, "ogg")
     var loops: Result<Boolean> by Property(Transformers.booleanTransformer, false)
+    var stopAtEnd: Result<Boolean> by Property(Transformers.booleanTransformer, false)
     var baseBpm: Result<Float> by Property(Transformers.positiveFloatTransformer("Base BPM must be positive"), 0f)
     var useTimeStretching: Result<Boolean> by Property(Transformers.booleanTransformer, true)
     var baseBpmRules: Result<BaseBpmRules> by Property(Transformers.baseBpmRulesTransformer, BaseBpmRules.ALWAYS)
@@ -107,7 +110,7 @@ class CueObject : DatamodelObject() {
             stretchable.orException(), repitchable.orException(), fileExtension.orException(), introSound.orException(),
             endingSound.orException(), responseIDs.orException(), baseBpm.orException(), useTimeStretching.orException(),
             baseBpmRules.orException(),
-            loops.orException(), earliness.orException(), loopStart.orException(), loopEnd.orException(),
+            loops.orException(), stopAtEnd.orException(), earliness.orException(), loopStart.orException(), loopEnd.orException(),
             pitchBending.orException(), writtenPitch.orException(), randomPitchLowCents.orException(), randomPitchHighCents.orException()
         )
     }
@@ -118,7 +121,7 @@ class CueObject : DatamodelObject() {
             stretchable.orElse(false), repitchable.orElse(false), fileExtension.orElse(""), introSound.orNull(),
             endingSound.orNull(), responseIDs.orNull(), baseBpm.orElse(0f), useTimeStretching.orElse(true),
             baseBpmRules.orElse(BaseBpmRules.ALWAYS),
-            loops.orElse(false), earliness.orElse(0f), loopStart.orElse(0f), loopEnd.orElse(0f),
+            loops.orElse(false), stopAtEnd.orElse(false), earliness.orElse(0f), loopStart.orElse(0f), loopEnd.orElse(0f),
             pitchBending.orElse(false), writtenPitch.orElse(0), randomPitchLowCents.orElse(0), randomPitchHighCents.orElse(0)
         )
     }
@@ -150,17 +153,21 @@ class PatternObject : DatamodelObject() {
 class MultiCueObject : DatamodelObject() {
     var cues: Result<MutableList<Result<CuePointerObject>>> by Property(Transformers.transformerToList(Transformers.cuePointerTransformer()))
     var duration: Result<Float> by Property(Transformers.positiveFloatTransformer("Duration must be higher than 0", false), 1f)
-
+    var height: Result<Float> by Property(Transformers.positiveFloatTransformer("Height must be higher than 0", false), 1f)
     // Optional after this line
     var stretchable: Result<Boolean> by Property(Transformers.booleanTransformer, false)
     var canSplit: Result<Boolean> by Property(Transformers.booleanTransformer, false)
+    var shouldCrop: Result<Boolean> by Property(Transformers.booleanTransformer, false)
+    var minLength: Result<Float> by Property(Transformers.positiveFloatTransformer("Min length must be positive"), 0.125f)
+    var maxLength: Result<Float> by Property(Transformers.positiveFloatTransformer("Max length must be positive"), 0f)
 
     override fun producePerfectADT(): MultiCue {
         return MultiCue(
             id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
             cues.orException().map { it.orException().producePerfectADT() }.toMutableList(),
-            duration.orException(),
-            stretchable.orException(),canSplit.orException()
+            duration.orException(), height.orException(),
+            stretchable.orException(),canSplit.orException(),
+            shouldCrop.orException(), minLength.orException(), maxLength.orException()
         )
     }
 
@@ -168,8 +175,9 @@ class MultiCueObject : DatamodelObject() {
         return MultiCue(
             id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
             cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(),
-            duration.orElse(1f),
-            stretchable.orElse(false),canSplit.orElse(false)
+            duration.orElse(1f), height.orElse(1f),
+            stretchable.orElse(false),canSplit.orElse(false),
+            shouldCrop.orElse(false), minLength.orElse(0f), maxLength.orElse(0f)
         )
     }
 }
