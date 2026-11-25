@@ -3,23 +3,53 @@ package io.github.chrislo27.rhre3.sfxdb.gui.editor.panes
 import io.github.chrislo27.rhre3.sfxdb.adt.CuePointer
 import io.github.chrislo27.rhre3.sfxdb.adt.MultiCue
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.Editor
+import io.github.chrislo27.rhre3.sfxdb.gui.util.Localization
 import io.github.chrislo27.rhre3.sfxdb.gui.util.bindLocalized
 import io.github.chrislo27.rhre3.sfxdb.gui.util.doubleSpinnerFactory
 import io.github.chrislo27.rhre3.sfxdb.gui.validation.Validators
 import javafx.scene.control.CheckBox
 import javafx.scene.control.Label
+import javafx.scene.control.Spinner
+import javafx.scene.control.SpinnerValueFactory
+import javafx.util.StringConverter
 import javafx.scene.control.Tooltip
 
 
 class MultiCueObjPane(editor: Editor, struct: MultiCue) : MultipartStructPane<MultiCue>(editor, struct) {
 
     val durationField = doubleSpinnerFactory(0.0, Float.MAX_VALUE.toDouble(), struct.duration.toDouble(), 0.5)
-    val heightField = doubleSpinnerFactory(1.0, Float.MAX_VALUE.toDouble(), struct.height.toDouble(), 1.0)
+    val heightField = Spinner<Int>(1, 10, struct.height.toInt())
     val stretchableField = CheckBox().apply { this.isSelected = struct.stretchable }
     val canSplitField = CheckBox().apply { this.isSelected = struct.canSplit }
     val shouldCropField = CheckBox().apply { this.isSelected = struct.shouldCrop }
-    val minLengthField = doubleSpinnerFactory(0.125, Float.MAX_VALUE.toDouble(), struct.minLength.toDouble(), 0.5)
-    val maxLengthField = doubleSpinnerFactory(0.0, Float.MAX_VALUE.toDouble(), struct.maxLength.toDouble(), 0.5)
+    val minLengthField: Spinner<Double> = Spinner<Double>().apply {
+        valueFactory = SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, struct.minLength.coerceAtLeast(0f).toDouble(), 0.5).apply {
+            this.converter = object : StringConverter<Double>() {
+                override fun toString(`object`: Double): String? {
+                    return if (`object` == 0.0) Localization["multiCue.minLength.noMinLength"] else `object`.toString()
+                }
+
+                override fun fromString(string: String): Double {
+                    return string.toDoubleOrNull() ?: 0.0
+                }
+            }
+        }
+        isEditable = true
+    }
+    val maxLengthField: Spinner<Double> = Spinner<Double>().apply {
+        valueFactory = SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, struct.maxLength.coerceAtLeast(0f).toDouble(), 0.5).apply {
+            this.converter = object : StringConverter<Double>() {
+                override fun toString(`object`: Double): String? {
+                    return if (`object` == 0.0) Localization["multiCue.maxLength.noMaxLength"] else `object`.toString()
+                }
+
+                override fun fromString(string: String): Double {
+                    return string.toDoubleOrNull() ?: 0.0
+                }
+            }
+        }
+        isEditable = true
+    }
     override val cuesPane: CuesPane<MultiCue> = CuesPane(this) { pointer, pane -> MultiCueCuePointerPane(pointer, pane) }
 
     init {
@@ -39,19 +69,19 @@ class MultiCueObjPane(editor: Editor, struct: MultiCue) : MultipartStructPane<Mu
             tooltip = Tooltip().bindLocalized("datamodel.stretchable.tooltip")
         }, stretchableField)
 
-        addProperty(Label().bindLocalized("datamodel.canSplit").apply {
-            tooltip = Tooltip().bindLocalized("datamodel.canSplit.tooltip")
+        addProperty(Label().bindLocalized("multiCue.canSplit").apply {
+            tooltip = Tooltip().bindLocalized("multiCue.canSplit.tooltip")
         }, canSplitField)
 
-        addProperty(Label().bindLocalized("datamodel.shouldCrop").apply {
-            tooltip = Tooltip().bindLocalized("datamodel.shouldCrop.tooltip")
+        addProperty(Label().bindLocalized("multiCue.shouldCrop").apply {
+            tooltip = Tooltip().bindLocalized("multiCue.shouldCrop.tooltip")
         }, shouldCropField)
 
-        addProperty(Label().bindLocalized("datamodel.minLength").apply {
-            tooltip = Tooltip().bindLocalized("datamodel.minLength.tooltip")
+        addProperty(Label().bindLocalized("multiCue.minLength").apply {
+            tooltip = Tooltip().bindLocalized("multiCue.minLength.tooltip")
         }, minLengthField)
-        addProperty(Label().bindLocalized("datamodel.maxLength").apply {
-            tooltip = Tooltip().bindLocalized("datamodel.maxLength.tooltip")
+        addProperty(Label().bindLocalized("multiCue.maxLength").apply {
+            tooltip = Tooltip().bindLocalized("multiCue.maxLength.tooltip")
         }, maxLengthField)
 
         centreVbox.children += cuesPane
@@ -93,6 +123,8 @@ class MultiCueObjPane(editor: Editor, struct: MultiCue) : MultipartStructPane<Mu
         // Validators
         validation.registerValidators(idField, Validators.OBJ_ID_BLANK, Validators.OBJ_ID_REGEX, Validators.OBJ_ID_STAR_SUB, Validators.identicalObjID(editor.gameObject, this.struct))
         validation.registerValidator(nameField, Validators.NAME_BLANK)
+        validation.registerValidators(minLengthField, Validators.minLengthGreaterThanMaxLength(this))
+        validation.registerValidators(maxLengthField, Validators.minLengthGreaterThanMaxLength(this))
     }
 
     class MultiCueCuePointerPane(cuePointer: CuePointer, parent: CuesPane<MultiCue>) : CuePointerPane<MultiCue>(parent, cuePointer) {

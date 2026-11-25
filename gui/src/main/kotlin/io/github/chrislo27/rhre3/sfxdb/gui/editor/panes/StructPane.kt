@@ -433,6 +433,15 @@ abstract class MultipartStructPane<T : MultipartDatamodel>(editor: Editor, struc
         val ignorePitchingField = CheckBox().apply { this.isSelected = cuePointer.ignorePitching }
         val stretchBehaviorComboBox =
             ComboBox<StretchBehavior>(FXCollections.observableArrayList(StretchBehavior.VALUES)).apply {
+                this.converter = object : StringConverter<StretchBehavior>() {
+                    override fun toString(behavior: StretchBehavior?): String? {
+                        return behavior?.properName
+                    }
+
+                    override fun fromString(string: String?): StretchBehavior {
+                        return StretchBehavior.STAY // not implemented
+                    }
+                }
                 this.selectionModel.select(cuePointer.stretchBehavior)
             }
 

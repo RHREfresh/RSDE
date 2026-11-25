@@ -9,6 +9,7 @@ import io.github.chrislo27.rhre3.sfxdb.adt.Datamodel
 import io.github.chrislo27.rhre3.sfxdb.adt.Game
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.panes.CueObjPane
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.panes.GameObjPane
+import io.github.chrislo27.rhre3.sfxdb.gui.editor.panes.MultiCueObjPane
 import io.github.chrislo27.rhre3.sfxdb.gui.util.UiLocalization
 import io.github.chrislo27.rhre3.sfxdb.validation.Transformers
 import javafx.beans.value.ObservableValue
@@ -163,6 +164,13 @@ object Validators {
     fun loopStartAheadOfEnd(cueObjPane: CueObjPane): Validator<Double> = Validator { t, u ->
         val loopEndValue = cueObjPane.loopEndField.value
         Validators.fromErrorIf(t, UiLocalization["validation.loopStartAheadOfEnd"]) { loopEndValue >= 0.0 && u > loopEndValue }
+    }
+
+    //MultiCue
+    fun minLengthGreaterThanMaxLength(multiCueObjPane: MultiCueObjPane): Validator<Double> = Validator { t, minLength ->
+        val maxLengthValue = multiCueObjPane.maxLengthField.value
+        val minLengthValue = multiCueObjPane.minLengthField.value
+        Validators.fromErrorIf(t, UiLocalization["validation.minLengthGreaterThanMaxLength"]) { maxLengthValue > 0  &&  minLengthValue >= maxLengthValue }
     }
 
     // MultipartObject
