@@ -1,10 +1,13 @@
 package io.github.chrislo27.rhre3.sfxdb.gui.editor.panes
 
 import io.github.chrislo27.rhre3.sfxdb.Constants
+import io.github.chrislo27.rhre3.sfxdb.CuePickerBehavior
 import io.github.chrislo27.rhre3.sfxdb.StretchBehavior
 import io.github.chrislo27.rhre3.sfxdb.adt.*
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.Editor
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.HasValidator
+import io.github.chrislo27.rhre3.sfxdb.gui.editor.panes.MultipartStructPane.CuePointerPane
+import io.github.chrislo27.rhre3.sfxdb.gui.editor.panes.MultipartStructPane.CuesPane
 import io.github.chrislo27.rhre3.sfxdb.gui.ui.Chip
 import io.github.chrislo27.rhre3.sfxdb.gui.ui.ChipPane
 import io.github.chrislo27.rhre3.sfxdb.gui.util.*
@@ -407,7 +410,7 @@ abstract class MultipartStructPane<T : MultipartDatamodel>(editor: Editor, struc
         }
     }
 
-    open class CuePointerPane<T : MultipartDatamodel>(val parentPane: CuesPane<T>, val cuePointer: CuePointer) : GridPane(), HasValidator {
+    open class CuePointerPane<T : MultipartDatamodel>(parentPane: CuesPane<T>, val cuePointer: CuePointer) : GridPane(), HasValidator {
         val validation = L10NValidationSupport()
 
         val idField = TextField(cuePointer.id)
@@ -523,4 +526,5 @@ abstract class MultipartStructPane<T : MultipartDatamodel>(editor: Editor, struc
             return validation.validationResult ?: ValidationResult()
         }
     }
+
 }

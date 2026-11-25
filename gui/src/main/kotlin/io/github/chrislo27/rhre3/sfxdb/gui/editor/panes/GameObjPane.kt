@@ -1,8 +1,10 @@
 package io.github.chrislo27.rhre3.sfxdb.gui.editor.panes
 
+import io.github.chrislo27.rhre3.sfxdb.CuePickerBehavior
 import io.github.chrislo27.rhre3.sfxdb.Language
 import io.github.chrislo27.rhre3.sfxdb.Series
 import io.github.chrislo27.rhre3.sfxdb.adt.*
+import io.github.chrislo27.rhre3.sfxdb.gui.RSDE
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.Editor
 import io.github.chrislo27.rhre3.sfxdb.gui.editor.HasValidator
 import io.github.chrislo27.rhre3.sfxdb.gui.ui.Chip
@@ -12,11 +14,13 @@ import io.github.chrislo27.rhre3.sfxdb.gui.validation.Validators
 import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
+import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.GridPane
+import javafx.scene.text.TextAlignment
 import javafx.util.Callback
 import javafx.util.StringConverter
 import org.controlsfx.validation.ValidationResult
@@ -64,6 +68,7 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
     val objectsGrid: GridPane = GridPane().apply {
         styleClass += "multipart-objects-pane"
     }
+
     val addButton: MenuButton = MenuButton("", ImageView(Image("/image/ui/add.png", 16.0, 16.0, true, true, true)))
     val removeButton: Button = Button("", ImageView(Image("/image/ui/remove.png", 16.0, 16.0, true, true, true)))
     val copyButton: Button = Button("", ImageView(Image("/image/ui/copy.png", 16.0, 16.0, true, true, true)))
@@ -99,6 +104,27 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
             }
         }
     }
+    val displayPane: GridPane = GridPane()
+    val selectLabel = Label().bindLocalized("multipart.selectAPointer").apply {
+        id = "pick-cue-pointer-label"
+        alignment = Pos.CENTER
+        textAlignment = TextAlignment.LEFT
+        isWrapText = true
+        maxWidth = Double.MAX_VALUE
+    }
+    val cuePickerBehaviorComboBox =
+        ComboBox<CuePickerBehavior>(FXCollections.observableArrayList(CuePickerBehavior.VALUES)).apply {
+            this.converter = object : StringConverter<CuePickerBehavior>() {
+                override fun toString(behavior: CuePickerBehavior?): String? {
+                    return behavior?.properName
+                }
+
+                override fun fromString(string: String?): CuePickerBehavior {
+                    return CuePickerBehavior.DEFAULT // not implemented
+                }
+            }
+            this.selectionModel.select(CuePickerBehavior.DEFAULT)
+        }
 
     init {
         titleLabel.textProperty().bind(idField.textProperty())
@@ -146,6 +172,8 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
             add(moveUpButton, 3, 1)
             add(moveDownButton, 4, 1)
             add(objectsListView, 0, 2, 5, 1)
+            add(displayPane, 6, 2)
+            add(selectLabel, 6, 1)
         }
 
         addButton.tooltip = Tooltip().bindLocalized("editor.add.datamodel")
@@ -260,15 +288,24 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         }
         objectsListView.setOnMouseClicked { evt ->
             val item = selectionModel.selectedItem
-            if (item != null && evt.button == MouseButton.PRIMARY && evt.clickCount >= 2) {
-                val pane = try {
-                    editor.getPane(item)
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                    ExceptionAlert(editor.editorPane.app, e).showAndWait()
-                    return@setOnMouseClicked
+            if (item != null && evt.button == MouseButton.PRIMARY) {
+                if(evt.clickCount == 1){
+                    displayPane.children.clear()
+                    // TODO CuePicker
+                    cuePickerBehaviorComboBox.selectionModel.select(CuePickerBehavior.DEFAULT)
+                    displayPane.add(Label().bindLocalized("gameObject.searchHints"),0,0)
+                    displayPane.add(cuePickerBehaviorComboBox,1,0)
+                    selectLabel.isVisible = false
+                } else if(evt.clickCount >= 2){
+                    val pane = try {
+                        editor.getPane(item)
+                    } catch (e: Throwable) {
+                        e.printStackTrace()
+                        ExceptionAlert(editor.editorPane.app, e).showAndWait()
+                        return@setOnMouseClicked
+                    }
+                    editor.switchToPane(pane)
                 }
-                editor.switchToPane(pane)
             }
         }
 
@@ -338,6 +375,12 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         }
         cuesAtBottomCheckbox.textProperty().addListener { _, _, _ ->
             editor.refreshLists()
+        }
+        // TODO CuePicker
+        cuePickerBehaviorComboBox.selectionModel.selectedItemProperty().addListener{ _, _, newValue ->
+//            (objectsListView.selectionModel.selectedItem as Datamodel).id = newValue.jsonName
+            editor.refreshLists()
+            editor.markDirty()
         }
     }
 
