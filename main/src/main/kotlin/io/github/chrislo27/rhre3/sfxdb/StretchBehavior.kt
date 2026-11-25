@@ -17,6 +17,5 @@ enum class StretchBehavior(@get:JsonValue val jsonName: String, @JsonIgnore val 
         @JvmStatic
         @JsonCreator
         fun getEnumFromJsonName(n: String): StretchBehavior = VALUES.first { n.toLowerCase() == it.jsonName.toLowerCase() }
-        val CODE_MAP: Map<String, Language> = VALID_VALUES.associateBy { it.code }
     }
 }
