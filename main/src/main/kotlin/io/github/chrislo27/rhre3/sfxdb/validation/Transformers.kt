@@ -107,6 +107,19 @@ object Transformers {
         else
             Result.Success(behavior)
     }
+    val cuePickerBehaviorTransformer: JsonTransformer<CuePickerBehavior> = { node ->
+        node.checkNodeType(JsonNodeType.STRING)
+        val st = node.textValue() ?: error("Escaped node type check!")
+        val behavior = CuePickerBehavior.VALUES.find {
+            it.jsonName.equals(st, ignoreCase = true)
+        }
+
+        if (behavior == null)
+            Result.Failure(node, st, "No cue picker behavior found with that name")
+        else
+            Result.Success(behavior)
+    }
+
     val baseBpmRulesTransformer: JsonTransformer<BaseBpmRules> = { node ->
         node.checkNodeType(JsonNodeType.STRING)
         val st = node.textValue() ?: error("Escaped node type check!")

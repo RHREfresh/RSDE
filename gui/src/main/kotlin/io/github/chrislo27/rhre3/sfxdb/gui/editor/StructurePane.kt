@@ -138,7 +138,7 @@ class StructurePane(val editorPane: EditorPane) : VBox() {
                 }
             }
         }*/
-        // TODO, check if this works on other platforms
+
         private val gameContextMenu: ContextMenu = ContextMenu().apply {
             items += MenuItem().apply {
                 bindLocalized("editor.openFolderLocation")
@@ -146,6 +146,7 @@ class StructurePane(val editorPane: EditorPane) : VBox() {
                 setOnAction {
                     val item = item ?: return@setOnAction
 
+                    // this doesn't work on Mac supposedly but IDK how to fix it
                     if (Desktop.isDesktopSupported()) {
                         Desktop.getDesktop().open(item.editor.folder)
                     }

@@ -1,5 +1,6 @@
 package io.github.chrislo27.rhre3.sfxdb.gui.scene
 
+import io.github.chrislo27.rhre3.sfxdb.CuePickerBehavior
 import io.github.chrislo27.rhre3.sfxdb.Series
 import io.github.chrislo27.rhre3.sfxdb.SoundFileExtensions
 import io.github.chrislo27.rhre3.sfxdb.adt.Cue
@@ -153,7 +154,7 @@ class StartNewPane(val app: RSDE) : BorderPane(), ChangesPresenceState {
 
                 if (addCues.isSelected) {
                     folder.listFiles { f: File -> f.extension in SoundFileExtensions.VALUES.map { it.fileExt } }.forEach { f ->
-                        game.objects.add(Cue("*/" + f.nameWithoutExtension, f.nameWithoutExtension, mutableListOf(), "", 0f, fileExtension = f.extension))
+                        game.objects.add(Cue("*/" + f.nameWithoutExtension, f.nameWithoutExtension, CuePickerBehavior.DEFAULT, mutableListOf(), "", 0f, fileExtension = f.extension))
                     }
                 }
 

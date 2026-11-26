@@ -105,7 +105,7 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         }
     }
     val displayPane: GridPane = GridPane()
-    val selectLabel = Label().bindLocalized("multipart.selectAPointer").apply {
+    val selectLabel = Label().bindLocalized("gameObject.selectAPointer").apply {
         id = "pick-cue-pointer-label"
         alignment = Pos.CENTER
         textAlignment = TextAlignment.LEFT
@@ -183,13 +183,13 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         moveDownButton.tooltip = Tooltip().bindLocalized("editor.moveDown")
 
         addButton.items.addAll(
-            AddMenuItem("CueObject") { Cue("", "", mutableListOf(), "", 0f) },
+            AddMenuItem("CueObject") { Cue("", "", CuePickerBehavior.DEFAULT, mutableListOf(), "", 0f) },
             SeparatorMenuItem(),
-            AddMenuItem("PatternObject") { Pattern("", "", mutableListOf(), "", mutableListOf()) },
-            AddMenuItem("MultiCueObject") { MultiCue("", "", mutableListOf(), "", mutableListOf(), 1f) },
-            AddMenuItem("EquidistantObject") { Equidistant("", "", mutableListOf(), "", mutableListOf()) },
-            AddMenuItem("KeepTheBeatObject") { KeepTheBeat("", "", mutableListOf(), "", mutableListOf()) },
-            AddMenuItem("RandomCueObject") { RandomCue("", "", mutableListOf(), "", mutableListOf()) }
+            AddMenuItem("PatternObject") { Pattern("", "", CuePickerBehavior.DEFAULT, mutableListOf(), "", mutableListOf()) },
+            AddMenuItem("MultiCueObject") { MultiCue("", "", CuePickerBehavior.DEFAULT, mutableListOf(), "", mutableListOf(), 1f) },
+            AddMenuItem("EquidistantObject") { Equidistant("", "", CuePickerBehavior.DEFAULT, mutableListOf(), "", mutableListOf()) },
+            AddMenuItem("KeepTheBeatObject") { KeepTheBeat("", "", CuePickerBehavior.DEFAULT, mutableListOf(), "", mutableListOf()) },
+            AddMenuItem("RandomCueObject") { RandomCue("", "", CuePickerBehavior.DEFAULT, mutableListOf(), "", mutableListOf()) }
         )
         val selectionModel = objectsListView.selectionModel
         removeButton.setOnAction {
@@ -291,9 +291,13 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
             if (item != null && evt.button == MouseButton.PRIMARY) {
                 if(evt.clickCount == 1){
                     displayPane.children.clear()
-                    // TODO CuePicker
-                    cuePickerBehaviorComboBox.selectionModel.select(CuePickerBehavior.DEFAULT)
-                    displayPane.add(Label().bindLocalized("gameObject.searchHints"),0,0)
+                    val selectedObject = selectionModel.selectedItem as? Datamodel
+                    if (selectedObject != null) {
+                        cuePickerBehaviorComboBox.selectionModel.select(
+                            selectedObject.cuePickerBehavior
+                        )
+                    }
+                    displayPane.add(Label().bindLocalized("gameObject.cuePicker"),0,0)
                     displayPane.add(cuePickerBehaviorComboBox,1,0)
                     selectLabel.isVisible = false
                 } else if(evt.clickCount >= 2){
@@ -376,9 +380,14 @@ class GameObjPane(editor: Editor) : StructPane<Game>(editor, editor.gameObject),
         cuesAtBottomCheckbox.textProperty().addListener { _, _, _ ->
             editor.refreshLists()
         }
-        // TODO CuePicker
         cuePickerBehaviorComboBox.selectionModel.selectedItemProperty().addListener{ _, _, newValue ->
-//            (objectsListView.selectionModel.selectedItem as Datamodel).id = newValue.jsonName
+            val selectedObject = objectsListView.selectionModel.selectedItem as Datamodel
+
+            if (newValue == null || selectedObject.cuePickerBehavior == newValue) {
+                return@addListener
+            }
+
+            selectedObject.cuePickerBehavior = newValue
             editor.refreshLists()
             editor.markDirty()
         }

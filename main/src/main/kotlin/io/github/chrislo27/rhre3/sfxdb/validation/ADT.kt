@@ -47,6 +47,7 @@ class GameObject : Struct {
 abstract class DatamodelObject : Struct {
     val id: Result<String> by Property(Transformers.idTransformer)
     val name: Result<String> by Property(Transformers.nonEmptyStringTransformer)
+    val cuePickerBehavior: Result<CuePickerBehavior> by Property(Transformers.cuePickerBehaviorTransformer, CuePickerBehavior.DEFAULT)
     val deprecatedIDs: Result<MutableList<String>> by Property(Transformers.stringArrayTransformer, mutableListOf())
     val subtext: Result<String> by Property(Transformers.stringTransformer, "")
 
@@ -106,7 +107,7 @@ class CueObject : DatamodelObject() {
 
     override fun producePerfectADT(): Cue {
         return Cue(
-            id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(), duration.orException(),
+            id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(), duration.orException(),
             stretchable.orException(), repitchable.orException(), fileExtension.orException(), introSound.orException(),
             endingSound.orException(), responseIDs.orException(), baseBpm.orException(), useTimeStretching.orException(),
             baseBpmRules.orException(),
@@ -117,7 +118,7 @@ class CueObject : DatamodelObject() {
 
     override fun produceImperfectADT(): Cue {
         return Cue(
-            id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""), duration.orElse(0f),
+            id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""), duration.orElse(0f),
             stretchable.orElse(false), repitchable.orElse(false), fileExtension.orElse(""), introSound.orNull(),
             endingSound.orNull(), responseIDs.orNull(), baseBpm.orElse(0f), useTimeStretching.orElse(true),
             baseBpmRules.orElse(BaseBpmRules.ALWAYS),
@@ -135,7 +136,7 @@ class PatternObject : DatamodelObject() {
 
     override fun producePerfectADT(): Pattern {
         return Pattern(
-            id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
+            id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(),
             cues.orException().map { it.orException().producePerfectADT() }.toMutableList(),
             stretchable.orException()
         )
@@ -143,7 +144,7 @@ class PatternObject : DatamodelObject() {
 
     override fun produceImperfectADT(): Pattern {
         return Pattern(
-            id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
+            id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
             cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(),
             stretchable.orElse(false)
         )
@@ -163,7 +164,7 @@ class MultiCueObject : DatamodelObject() {
 
     override fun producePerfectADT(): MultiCue {
         return MultiCue(
-            id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
+            id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(),
             cues.orException().map { it.orException().producePerfectADT() }.toMutableList(),
             duration.orException(), height.orException(),
             stretchable.orException(),canSplit.orException(),
@@ -173,7 +174,7 @@ class MultiCueObject : DatamodelObject() {
 
     override fun produceImperfectADT(): MultiCue {
         return MultiCue(
-            id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
+            id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
             cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(),
             duration.orElse(1f), height.orElse(1f),
             stretchable.orElse(false),canSplit.orElse(false),
@@ -189,14 +190,14 @@ class EquidistantObject : DatamodelObject() {
 
     override fun producePerfectADT(): Equidistant {
         return Equidistant(
-            id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
+            id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(),
             cues.orException().map { it.orException().producePerfectADT() }.toMutableList(), distance.orException(), stretchable.orException()
         )
     }
 
     override fun produceImperfectADT(): Equidistant {
         return Equidistant(
-            id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
+            id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
             cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(),
             distance.orElse(0f), stretchable.orElse(false)
         )
@@ -209,14 +210,14 @@ class KeepTheBeatObject : DatamodelObject() {
 
     override fun producePerfectADT(): KeepTheBeat {
         return KeepTheBeat(
-            id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
+            id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(),
             cues.orException().map { it.orException().producePerfectADT() }.toMutableList(), defaultDuration.orException()
         )
     }
 
     override fun produceImperfectADT(): KeepTheBeat {
         return KeepTheBeat(
-            id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
+            id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
             cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(), defaultDuration.orElse(0f)
         )
     }
@@ -231,14 +232,14 @@ class RandomCueObject : DatamodelObject() {
 
     override fun producePerfectADT(): RandomCue {
         return RandomCue(
-            id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
+            id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(),
             cues.orException().map { it.orException().producePerfectADT() }.toMutableList(), responseIDs.orException(), stretchable.orException()
         )
     }
 
     override fun produceImperfectADT(): RandomCue {
         return RandomCue(
-            id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
+            id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
             cues.orElse(mutableListOf()).mapNotNull { it.orNull()?.producePerfectADT() }.toMutableList(), responseIDs.orNull(), stretchable.orElse(false)
         )
     }
@@ -246,41 +247,41 @@ class RandomCueObject : DatamodelObject() {
 
 class EndRemixEntityObject : DatamodelObject() {
     override fun producePerfectADT(): EndRemixEntity {
-        return EndRemixEntity(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException())
+        return EndRemixEntity(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException())
     }
 
     override fun produceImperfectADT(): EndRemixEntity {
-        return EndRemixEntity(id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
+        return EndRemixEntity(id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
     }
 }
 
 class ShakeEntityObject : DatamodelObject() {
     override fun producePerfectADT(): ShakeEntity {
-        return ShakeEntity(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException())
+        return ShakeEntity(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException())
     }
 
     override fun produceImperfectADT(): ShakeEntity {
-        return ShakeEntity(id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
+        return ShakeEntity(id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
     }
 }
 
 class TextureEntityObject : DatamodelObject() {
     override fun producePerfectADT(): TextureEntity {
-        return TextureEntity(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException())
+        return TextureEntity(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException())
     }
 
     override fun produceImperfectADT(): TextureEntity {
-        return TextureEntity(id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
+        return TextureEntity(id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
     }
 }
 
 class TapeMeasureObject : DatamodelObject() {
     override fun producePerfectADT(): TapeMeasure {
-        return TapeMeasure(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException())
+        return TapeMeasure(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException())
     }
 
     override fun produceImperfectADT(): TapeMeasure {
-        return TapeMeasure(id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
+        return TapeMeasure(id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
     }
 }
 
@@ -288,12 +289,12 @@ class SubtitleEntityObject : DatamodelObject() {
     val subtitleType: Result<SubtitleTypes> by Property(Transformers.subtitleTypesTransformer)
 
     override fun producePerfectADT(): SubtitleEntity {
-        return SubtitleEntity(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(), subtitleType.orException().type)
+        return SubtitleEntity(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(), subtitleType.orException().type)
     }
 
     override fun produceImperfectADT(): SubtitleEntity {
         return SubtitleEntity(
-            id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""), subtitleType.orNull()?.type ?: ""
+            id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""), subtitleType.orNull()?.type ?: ""
         )
     }
 }
@@ -304,33 +305,33 @@ class PlayalongEntityObject : DatamodelObject() {
     var method: Result<PlayalongMethod> by Property(Transformers.playalongMethodTransformer)
 
     override fun producePerfectADT(): PlayalongEntity {
-        return PlayalongEntity(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
+        return PlayalongEntity(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(),
             stretchable.orException(), method.orException().name, input.orException().id)
     }
 
     override fun produceImperfectADT(): PlayalongEntity {
-        return PlayalongEntity(id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
+        return PlayalongEntity(id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
             stretchable.orElse(false), method.orElse(PlayalongMethod.PRESS).name, input.orElse(PlayalongInput.BUTTON_A).id)
     }
 }
 
 class MusicDistortEntityObject : DatamodelObject() {
     override fun producePerfectADT(): MusicDistortEntity {
-        return MusicDistortEntity(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException())
+        return MusicDistortEntity(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException())
     }
 
     override fun produceImperfectADT(): MusicDistortEntity {
-        return MusicDistortEntity(id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
+        return MusicDistortEntity(id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
     }
 }
 
 class PitchBenderEntityObject : DatamodelObject() {
     override fun producePerfectADT(): PitchBenderEntity {
-        return PitchBenderEntity(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException())
+        return PitchBenderEntity(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException())
     }
 
     override fun produceImperfectADT(): PitchBenderEntity {
-        return PitchBenderEntity(id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
+        return PitchBenderEntity(id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""))
     }
 }
 
@@ -340,12 +341,12 @@ class PitchDependentEntityObject : DatamodelObject() {
     var responseIDs: Result<MutableList<String>> by Property(Transformers.responseIDsTransformer, mutableListOf())
     
     override fun producePerfectADT(): PitchDependentEntity {
-        return PitchDependentEntity(id.orException(), name.orException(), deprecatedIDs.orException(), subtext.orException(),
+        return PitchDependentEntity(id.orException(), name.orException(), cuePickerBehavior.orException(), deprecatedIDs.orException(), subtext.orException(),
             intervals.orException(), responseIDs.orException())
     }
 
     override fun produceImperfectADT(): PitchDependentEntity {
-        return PitchDependentEntity(id.orElse(""), name.orElse(""), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
+        return PitchDependentEntity(id.orElse(""), name.orElse(""), cuePickerBehavior.orElse(CuePickerBehavior.DEFAULT), deprecatedIDs.orElse(mutableListOf()), subtext.orElse(""),
                 intervals.orElse(mutableMapOf()), responseIDs.orElse(mutableListOf()))
     }
 }
